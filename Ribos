@@ -1,0 +1,36 @@
+wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/fungi/release-57/fasta/saccharomyces_cerevisiae/ncrna/Saccharomyces_cerevisiae.R64-1-1.ncrna.fa.gz
+wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/fungi/release-57/fasta/saccharomyces_cerevisiae/cds/Saccharomyces_cerevisiae.R64-1-1.cds.all.fa.gz #will contain UTR
+wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/fungi/release-57/fasta/saccharomyces_cerevisiae/cdna/Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa.gz ##won't contain UTR
+wget http://gtrnadb.ucsc.edu/download/tRNAs/eukaryotic-tRNAs.fa.gz ##tRNA
+
+
+
+
+
+
+zcat Saccharomyces_cerevisiae.R64-1-1.ncrna.fa.gz  |
+awk 'BEGIN{{RS=">"}} NR>1 {{sub("\n","\t"); gsub("\n",""); print RS$0}}' |
+awk '/:Mt_rRNA|:Mt_tRNA|:rRNA|:scRNA|:snlRNA|:snoRNA|:snRNA|:tRNA|:tRNA_pseudogene/ && !seen[$NF]++ {{print $1 "\n" $NF}}' > Outdir/Sacrromyces_cerv.Tair10.ncrna.fa 
+zcat eukaryotic-tRNAs.fa.gz | awk 'BEGIN{{RS=">"}} NR>1 {{sub("\n","\t"); gsub("\n",""); print RS$0}}' | grep {params.sp} | awk '!seen[$NF]++ {{print $1 "\n" $NF}}' >>  Outdir/Sacrromyces_cerv.Tair10.ncrna.fa 
+
+
+
+
+Input=/Volumes/scratch/brownlab/finn_data/ribosome_profiling/doc/jupyter_notebooks/Lim_git/riboss/Fungi/fungi_annotation_data/Outdir/Sacrromyces_cerv.Tair10.ncrna.fa 
+THREADS=8  
+Outdir_species1=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/Fungi/fungi_annotation_data/Outdir
+STAR --runThreadN ${THREADS} --runMode genomeGenerate --genomeDir ${Outdir_species1} --genomeFastaFiles ${Input} --genomeSAindexNbases 7 --genomeChrBinNbits 11
+
+
+
+#PC=proteincoding
+REF=/Volumes/scratch/brownlab/finn_data/ribosome_profiling/doc/jupyter_notebooks/Lim_git/riboss/Fungi/fungi_annotation_data
+PC_INDEX=$REF/Star
+PC_INPUT=$REF/Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa
+STAR --runThreadN ${THREADS} --runMode genomeGenerate --genomeDir ${PC_INDEX} --genomeFastaFiles ${PC_INPUT} --genomeSAindexNbases 11 --genomeChrBinNbits 12
+
+
+WORKDIR=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/doc
+Contam_index=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/ref/Arabidopsis/Arabidopsis/Star
+SRA_RIBO=$WORKDIR/SRR3498209.fastq.gz                  
+Test_adapter=TCGTATGCCGTCTTCTGCTTG
