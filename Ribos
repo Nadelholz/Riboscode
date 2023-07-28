@@ -30,7 +30,14 @@ PC_INPUT=$REF/Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa
 STAR --runThreadN ${THREADS} --runMode genomeGenerate --genomeDir ${PC_INDEX} --genomeFastaFiles ${PC_INPUT} --genomeSAindexNbases 11 --genomeChrBinNbits 12
 
 
-WORKDIR=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/doc
-Contam_index=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/ref/Arabidopsis/Arabidopsis/Star
-SRA_RIBO=$WORKDIR/SRR3498209.fastq.gz                  
+GenomeDir=Sacrromyces_cerv.Tair10.ncrna.fa
+WORKDIR=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/Fungi
+Contam_index=/Volumes/archive/userdata/student_users/finndobbie/ribosome_profiling/Lim_git/riboss/Fungi/fungi_annotation_data/Star/
+#pigz SRR24175965/SRR24175965.sra
+SRA_RIBO=$WORKDIR/Fastqdump_test/SRR24175965.fastq.gz              
 Test_adapter=TCGTATGCCGTCTTCTGCTTG
+STAR --runThreadN ${THREADS} --genomeDir ${PC_INDEX} --readFilesIn ${SRA_RIBO} --clip3pAdapterSeq  ${Test_adapter} --readFilesCommand zcat --seedSearchLmax 10 --outStd SAM --outReadsUnmapped Fastx --outFilterMultimapScoreRange 0 --outFilterMultimapNmax 255 --outFilterMismatchNmax 1 --outFilterIntronMotifs RemoveNoncanonical > /dev/null
+
+
+
+#8
